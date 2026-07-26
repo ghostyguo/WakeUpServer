@@ -1,9 +1,10 @@
 
-#ifndef WebServer_h
+#if (!defined(WebServer_h))
 #define WebServer_h
 
+#include "NetDef.h"
 
-void webserver_init();
-int webserver_client_connected();
+void WebServer_Init();
+void WebServer_Loop();
 
-#endif
+#endif //WebServer_h
