@@ -9,8 +9,10 @@
 #include "LocalTime.h"
 #include "WakeOnLan.h"
 #include "WakeupServer.h"
+#include "RTOS.h"
 
 #define DEBUG_LEVEL 1
+
 
 int NumberOfSite;
 static Computer SiteInfo[] = {
@@ -19,38 +21,64 @@ static Computer SiteInfo[] = {
     {    "Sabre15", {0x80,0xFA,0x5B,0x58,0xFF,0xC9}, { 7, 30}, false}
 };
 
+
+// forward definition required
+void WebServerTask();
+void LocalTimeTask();
+void CheckWakeUpTask();
+
+Task *pWebServerTask;
+Task *pLocalTimeTask;
+Task *pCheckWakeUpTask;
+
 void setup () 
 {
     NumberOfSite = sizeof(SiteInfo)/sizeof(Computer); //each contains 6 bytes of MAC address
    
     Serial.begin(9600); //debug port, init first
+    Serial.println(F("--- Wackup Server ---"));
+
     Net_Init(); //所有網路共用的Init
     WakeOnLan_Init();
     LocalTime_Init();
     WebServer_Init();
-    delay(10000);
+    delay(1000);
+
+    // Add tasks to RTOS
+    pWebServerTask = RTOS.taskManager.addTask(WebServerTask, "WebServerTask", 100); 
+    pLocalTimeTask = RTOS.taskManager.addTask(LocalTimeTask, "LocalTimeTask", 1000); 
+    pCheckWakeUpTask= RTOS.taskManager.addTask(CheckWakeUpTask, "CheckWakeUpTask", 1000);
+    RTOS.init();
+
 }
  
 void loop() 
-{   
-    LocalTime_Loop();
+{
+    RTOS.run();   
+}
+
+
+void WebServerTask()
+{  
     WebServer_Loop();
+}
+
+void LocalTimeTask()
+{
+    LocalTime_Loop();
+}
+
+void CheckWakeUpTask() 
+{   
     #if (DEBUG_LEVEL>0)    
     Serial.print("Local Time = ");
-    Serial.println(LocalTime_GetTimeString());
+    Serial.println(LocalTime_GetDateTimeString());
     #endif
-    //LocalTime_GetDateTimeString();
 
     int wackupCount = 0;
     for (int i=0; i<NumberOfSite; i++)
     {
         #if (DEBUG_LEVEL>1)
-        Serial.print("Now ");
-        Serial.print(LocalTime_GetHour());
-        Serial.print(":");
-        Serial.print(LocalTime_GetMinute());
-        Serial.print(":");
-        Serial.print(LocalTime_GetSecond());
         Serial.print(" Check#");
         Serial.print(i);
         Serial.print(" -> ");
@@ -83,25 +111,6 @@ void loop()
             SiteInfo[i].isWakeUping = false; //不在同一分鐘就清除
         }
     }
-    if (wackupCount>0) {
-        delay(5000); // to prevent Wackup Twice
-    }
     delay(1000);
-} //loop()
-
-/*
-void showCurrentTime()
-{
-  Serial.print("Current time is ");
-  if (hour<10) Serial.print("0");
-  Serial.print(hour);
-  Serial.print(":");
-  if (minute<10) Serial.print("0");
-  Serial.print(minute);
-  Serial.print(":");
-  if (second<10) Serial.print("0");
-  Serial.println(second);
 }
-*/
-
 

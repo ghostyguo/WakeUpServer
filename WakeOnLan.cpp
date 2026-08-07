@@ -32,7 +32,11 @@ void SendWolPacket(byte macAddress[]) {
     }
   }
 
-  // Send the packet via WolUdp broadcast
+  // Send the packet via WolUdp broadcast twice
+  WolUdp.beginPacket(BroadcastIP, WolPort);
+  WolUdp.write(packet, sizeof(packet));
+  WolUdp.endPacket();
+  delay(1000);
   WolUdp.beginPacket(BroadcastIP, WolPort);
   WolUdp.write(packet, sizeof(packet));
   WolUdp.endPacket();

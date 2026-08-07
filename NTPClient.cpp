@@ -153,12 +153,21 @@ int NTPClient::getSeconds() const {
 String NTPClient::getFormattedEpochTime() const {
   return getFormattedTime(this->getEpochTime());
 }
-String NTPClient::getFormattedLocalTime() const {
-  return getFormattedTime(this->getEpochTime()+3600*8); //UTC+8
+
+String NTPClient::getFormattedTime() const {
+  unsigned long hours = getHours() ;
+  String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
+
+  unsigned long minutes = getMinutes();
+  String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
+
+  unsigned long seconds = getSeconds();
+  String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
+
+  return hoursStr + ":" + minuteStr + ":" + secondStr;
 }
 
-String NTPClient::getFormattedTime(unsigned long Time) const 
-{
+String NTPClient::getFormattedTime(unsigned long Time) const {
   unsigned long hours = (Time % 86400L) / 3600;
   String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
 
@@ -170,9 +179,29 @@ String NTPClient::getFormattedTime(unsigned long Time) const
 
   return hoursStr + ":" + minuteStr + ":" + secondStr;
 }
-
-String NTPClient::getFormattedFullTime(unsigned long Time) const 
+String NTPClient::getFormattedDateTime() const 
 {
+  unsigned long day = getDay() ;
+  String dayStr = DayName[day];
+
+  unsigned long hours = getHours() ;
+  String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
+
+  unsigned long minutes = getMinutes();
+  String minuteStr = minutes < 10 ? "0" + String(minutes) : String(minutes);
+
+  unsigned long seconds = getSeconds();
+  String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
+
+  return dayStr + " " +  hoursStr + ":" + minuteStr + ":" + secondStr;
+}
+
+
+String NTPClient::getFormattedDateTime(unsigned long Time) const 
+{
+  unsigned long day = getDay() ;
+  String dayStr = DayName[day];
+
   unsigned long hours = (Time % 86400L) / 3600;
   String hoursStr = hours < 10 ? "0" + String(hours) : String(hours);
 
@@ -182,7 +211,7 @@ String NTPClient::getFormattedFullTime(unsigned long Time) const
   unsigned long seconds = Time % 60;
   String secondStr = seconds < 10 ? "0" + String(seconds) : String(seconds);
 
-  return hoursStr + ":" + minuteStr + ":" + secondStr;
+  return  dayStr + " " +  hoursStr + ":" + minuteStr + ":" + secondStr;
 }
 
 void NTPClient::end() {

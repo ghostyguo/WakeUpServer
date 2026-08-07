@@ -4,6 +4,7 @@
 #include "WakeOnLan.h"
 #include "LocalTime.h"
 
+#define DEBUG_LEVEL 0
 // Initialize the Ethernet server library
 // with the IP address and port you want to use
 // (port 80 is default for HTTP):
@@ -23,7 +24,6 @@ void WebServer_Init() {
   //Ethernet.init(20);  // Teensy++ 2.0
   //Ethernet.init(15);  // ESP8266 with Adafruit FeatherWing Ethernet
   //Ethernet.init(33);  // ESP32 with Adafruit FeatherWing Ethernet
-  Serial.println("Wackup WebServer");
 
   // start the server
   server.begin();
@@ -54,7 +54,10 @@ void WebServer_Loop()
   // listen for incoming clients
   EthernetClient client = server.available();
   if (client) {
+
+    //#if (DEBUG_LEVEL>0)
     Serial.println("new client");   
+    //#endif
     
     WakeUpID=0;
     // an http request ends with a blank line
@@ -63,7 +66,11 @@ void WebServer_Loop()
       if (client.available()) {
         char c = client.read();
         LineBuffer[LineBufferPtr] = c;
+        
+        #if (DEBUG_LEVEL>2)
         Serial.write(c);
+        #endif
+
         // if you've gotten to the end of the line (received a newline
         // character) and the line is blank, the http request has ended,
         // so you can send a reply
@@ -113,30 +120,29 @@ void WebServer_Loop()
             client.print(SiteInfo[WakeUpID-1].Name);
             client.println("<br />"); 
           }
-          /*
-          client.print(F("WakeUpID="));
-          client.print(WakeUpID);
-            //client.print(WakeUpName[WakeUpID-1]);
-          client.println(F("<br />")); 
-          client.println(F("</html>"));
-          */
           break;
         }
         if (c == '\n') {
           // you're starting a new line
-          Serial.println(LineBufferPtr);
+
+          #if (DEBUG_LEVEL>1)
+          Serial.println(LineBuffer);
+          #endif
+
           if (strncmp(LineBuffer,WolCommand,strlen(WolCommand))==0) {
-             WakeUpID=LineBuffer[strlen(WolCommand)]-'0';
-             if ((WakeUpID>0) && (WakeUpID<=NumberOfSite)) {
-               SendWolPacket(SiteInfo[WakeUpID-1].IP);
-             }
-             else
-             {
-               WakeUpID=0;             
-             }
-             Serial.print("****** WOL #");
-             Serial.print(WakeUpID);
-             Serial.println(" ******");
+            WakeUpID=LineBuffer[strlen(WolCommand)]-'0';
+            if ((WakeUpID>0) && (WakeUpID<=NumberOfSite)) {
+              SendWolPacket(SiteInfo[WakeUpID-1].IP);
+            }
+            else
+            {
+              WakeUpID=0;             
+            }
+            #if (DEBUG_LEVEL>1)
+            Serial.print("****** WOL #");
+            Serial.print(WakeUpID);
+            Serial.println(" ******");
+            #endif
           }
           LineBufferPtr=0;
           currentLineIsBlank = true;
@@ -153,6 +159,9 @@ void WebServer_Loop()
     delay(1);
     // close the connection:
     client.stop();
+    
+    //#if (DEBUG_LEVEL>0)
     Serial.println("client disconnected");
+    //#endif
   }
 }

@@ -11,5 +11,6 @@ int LocalTime_GetMinute();
 int LocalTime_GetSecond();
 void LocalTime_GetDateString();
 String LocalTime_GetTimeString();
+String LocalTime_GetDateTimeString();
 
 #endif //LocalTime

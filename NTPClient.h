@@ -26,6 +26,7 @@ class NTPClient {
     byte          _packetBuffer[NTP_PACKET_SIZE];
 
     void          sendNTPPacket();
+    const String DayName[7] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
   public:
     NTPClient(UDP& udp);
@@ -101,9 +102,10 @@ class NTPClient {
      * @return time formatted like `hh:mm:ss`
      */
     String getFormattedEpochTime() const;
-    String getFormattedLocalTime() const;
+    String getFormattedTime() const;
     String getFormattedTime(unsigned long Time) const;
-    String getFormattedFullTime(unsigned long Time) const;
+    String getFormattedDateTime() const;
+    String getFormattedDateTime(unsigned long Time) const;
 
     /**
      * @return time in seconds since Jan. 1, 1970

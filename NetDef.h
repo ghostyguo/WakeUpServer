@@ -17,6 +17,9 @@ const char timeServer[] = "time.nist.gov"; // time.nist.gov NTP server
 extern byte mac[];
 extern IPAddress localIP;
 extern IPAddress BroadcastIP;
+extern IPAddress DNS;
+extern IPAddress GateWay;
+extern IPAddress SubNet;
 
 void Net_Init();
 

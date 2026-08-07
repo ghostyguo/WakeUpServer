@@ -5,6 +5,9 @@ byte mac[] = { 0xDE, 0xAD, 0xBE, 0xEF, 0xFE, 0xED };
 
 IPAddress LocalIP(192, 168, 88, 99);
 IPAddress BroadcastIP(192, 168, 88, 255); 
+IPAddress DNS(8, 8, 8, 8); 
+IPAddress GateWay(192, 168, 88, 1); 
+IPAddress SubNet(255, 255, 255, 0); 
 
 void Net_Init()
 {
@@ -17,18 +20,21 @@ void Net_Init()
   //Ethernet.init(33);  // ESP32 with Adafruit FeatherWing Ethernet
 
   // start Ethernet interface
-  if (Ethernet.begin(mac) == 0) {
-    Serial.println(F("Failed to configure Ethernet using DHCP"));
-    // Check for Ethernet hardware present
-    if (Ethernet.hardwareStatus() == EthernetNoHardware) {
-      Serial.println(F("Ethernet shield was not found."));
-    } else if (Ethernet.linkStatus() == LinkOFF) {
-      Serial.println(F("Ethernet cable is not connected."));
-    }
+  Ethernet.begin(mac, LocalIP, DNS, GateWay); //try fixed IP
+  if (Ethernet.hardwareStatus() == EthernetNoHardware) {
+    Serial.println(F("Ethernet shield was not found."));
     Serial.println(F("*** System Halted!"));
-    // no point in carrying on, so do nothing forevermore:
     while (true) {
       delay(1);
-    }
+    } 
+  }
+  if (Ethernet.linkStatus() == LinkOFF) //not linked
+  {
+      Serial.println(F("Ethernet not linked, Try DHCP..."));
+      Ethernet.begin(mac);
+  }
+  if (Ethernet.linkStatus() == LinkOFF) //not linked?
+  {
+      Serial.println(F("Cable is not connected?"));
   }
 }

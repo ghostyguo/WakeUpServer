@@ -16,8 +16,10 @@ NTPClient timeClient(ntpUDP);
 
 unsigned long oldMillis;
 
-void LocalTime_Init(){
+void LocalTime_Init()
+{
   timeClient.begin();
+  timeClient.setTimeOffset(8*3600); //UTC+8
   oldMillis = millis();
 }
 
@@ -30,7 +32,8 @@ void LocalTime_Loop() {
 
 int LocalTime_GetHour()
 {
-  return (timeClient.getHours()+8)%24; //UTC+8
+  //return (timeClient.getHours()+8)%24; //UTC+8
+  return timeClient.getHours();
 }
 
 int LocalTime_GetMinute()
@@ -58,5 +61,11 @@ void LocalTime_GetDateString()
 
 String LocalTime_GetTimeString()
 {
-   return timeClient.getFormattedLocalTime();
+   return timeClient.getFormattedTime();
+}
+
+
+String LocalTime_GetDateTimeString()
+{
+   return timeClient.getFormattedDateTime();
 }
