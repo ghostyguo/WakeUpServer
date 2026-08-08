@@ -17,8 +17,8 @@
 int NumberOfSite;
 static Computer SiteInfo[] = {
     //{      "J1900", {0x40,0x16,0x7E,0x2A,0x4E,0xFC}, {21, 30}},
-    {"MoneyStudio", {0x7C,0x10,0xC9,0xBA,0xA8,0x75}, { 7, 30}, false},
-    {    "Sabre15", {0x80,0xFA,0x5B,0x58,0xFF,0xC9}, { 7, 30}, false}
+    {"MoneyStudio", {0x7C,0x10,0xC9,0xBA,0xA8,0x75}, { {false, true, true, true, true, true, false} ,7, 30}, false},
+    {    "Sabre15", {0x80,0xFA,0x5B,0x58,0xFF,0xC9}, { {false, true, true, true, true, true, false} ,7, 30}, false}
 };
 
 
@@ -81,34 +81,46 @@ void CheckWakeUpTask()
         #if (DEBUG_LEVEL>1)
         Serial.print(" Check#");
         Serial.print(i);
-        Serial.print(" -> ");
+        Serial.print(" -> [");
+        for (int k=0; k<7; k++) {                        
+            Serial.print(" ");
+            Serial.print(SiteInfo[i].WakeUp.Day[k]);
+        }
+        
+        Serial.print("] ");
         Serial.print(SiteInfo[i].WakeUp.Hour);
         Serial.print(":");
         Serial.println(SiteInfo[i].WakeUp.Minute);
         #endif
 
-        if ((LocalTime_GetHour()== SiteInfo[i].WakeUp.Hour) && 
-            (LocalTime_GetMinute()== SiteInfo[i].WakeUp.Minute))
-        { 
-            if (!SiteInfo[i].isWakeUping)
-            {
-                SiteInfo[i].isWakeUping = true;
-                #if (DEBUG_LEVEL>1)
-                Serial.print("***Call WOL ");
-                Serial.println(SiteInfo[i].Name);
-                #endif
+        for (int k=0; k<7; k++)
+        {
+            if (SiteInfo[i].WakeUp.Day[LocalTime_GetDay()] && //Sunday~Saturday
+                LocalTime_GetHour()== SiteInfo[i].WakeUp.Hour && 
+                LocalTime_GetMinute()== SiteInfo[i].WakeUp.Minute
+               )
+            { 
+                if (!SiteInfo[i].isWakeUping)
+                {
+                    SiteInfo[i].isWakeUping = true;
+                    #if (DEBUG_LEVEL>1)
+                    Serial.print("***Call WOL ");
+                    Serial.println(SiteInfo[i].Name);
+                    #endif
                 
-                SendWolPacket(SiteInfo[i].IP);
-                wackupCount++;
+                    SendWolPacket(SiteInfo[i].IP);
+                    wackupCount++;
+                }
+                else
+                {
+                    //已經喚醒過了
+                }
+                break;
             }
-            else
-            {
-                //已經喚醒過了
+            else 
+            {            
+                SiteInfo[i].isWakeUping = false; //不在同一分鐘就清除
             }
-        }
-        else 
-        {            
-            SiteInfo[i].isWakeUping = false; //不在同一分鐘就清除
         }
     }
     delay(1000);

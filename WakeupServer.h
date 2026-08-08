@@ -6,6 +6,7 @@
 #define WakeupSercve_h
 
 struct WakeUpTime {
+    bool Day[7]; //Sunday, Monday, ... Saturday
     byte Hour, Minute;
 };
 

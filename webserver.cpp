@@ -88,18 +88,6 @@ void WebServer_Loop()
           client.println(F("Wake on Lan Server ("));
           client.println(Ethernet.localIP());
           client.println(F(")<br/><br/>"));
-  
-          /*
-          client.print("Auto wake up time is ");
-          if (WakeUpHour<10) client.print("0");
-          client.print(WakeUpHour);
-          client.print(":");
-          if (WakeUpMinute<10) client.print("0");
-          client.print(WakeUpMinute);
-          client.print(":00");
-          client.println("<br/><br/>");       
-          */
-
           client.print(F("Current time is "));
           client.print(LocalTime_GetTimeString());
 

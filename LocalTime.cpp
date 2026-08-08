@@ -30,6 +30,13 @@ void LocalTime_Loop() {
   }
 }
 
+int LocalTime_GetDay()
+{
+  //return (timeClient.getHours()+8)%24; //UTC+8
+  int day=timeClient.getDay();
+  return (day>=0 && day<7) ? timeClient.getDay() : -1;
+}
+
 int LocalTime_GetHour()
 {
   //return (timeClient.getHours()+8)%24; //UTC+8

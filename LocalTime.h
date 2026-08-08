@@ -6,6 +6,7 @@
 
 void LocalTime_Init();
 void LocalTime_Loop();
+int LocalTime_GetDay();
 int LocalTime_GetHour();
 int LocalTime_GetMinute();
 int LocalTime_GetSecond();
