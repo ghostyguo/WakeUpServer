@@ -15,10 +15,10 @@ void SendWolPacket(byte macAddress[]) {
   Serial.print(F("Send WOL Packet:"));
   for (int i=0; i<6; i++) 
   {
-     if (i>0) Serial.print(":");
-     Serial.print(macAddress[i]);
-     Serial.println();
+     Serial.print(macAddress[i],HEX);
+     if (i<5) Serial.print(F(":"));
   }
+  Serial.println();
 
   // Initialize the first 6 bytes with 0xFF
   for (int i = 0; i < 6; i++) {
@@ -41,5 +41,5 @@ void SendWolPacket(byte macAddress[]) {
   WolUdp.write(packet, sizeof(packet));
   WolUdp.endPacket();
   
-  Serial.println("Magic packet sent!");
+  //Serial.println(F("Magic packet sent!"));
 }

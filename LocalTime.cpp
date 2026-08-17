@@ -20,7 +20,13 @@ void LocalTime_Init()
 {
   timeClient.begin();
   timeClient.setTimeOffset(8*3600); //UTC+8
+  timeClient.setUpdateInterval((unsigned long)60000*10); //In ms, 60000ms in 1 minute, total 10 minutes
   oldMillis = millis();
+}
+
+bool LocalTime_IsTimeSet()
+{
+  return timeClient.isTimeSet();
 }
 
 void LocalTime_Loop() {

@@ -7,12 +7,16 @@
 #ifndef RTOS_h
 #define RTOS_h
 
+
+#define DEBUG_LEVEL 0
+//#define EXTRA_SUPPORT 1
+
 typedef enum  {RUNNING, SUSPEND} TaskState;
 typedef enum  {RoundRobin, PriorityQueue} SwitchingAlgorithm;
 
 
-#define   RTOS_VERSION    "0.1"
-#define   MaxTaskNumber   3
+#define   RTOS_VERSION    "0.2"
+#define   MaxTaskNumber   4
 #define   DefaultSwitchingAlgorithm    PriorityQueue
 
 class Task {
@@ -27,12 +31,17 @@ class Task {
         char *name; 
 
         Task(); //Constructor
-        void (*entry)();
-        Task* elapsedShift(long tickShift);
-        Task* setState(TaskState taskState);
-        Task* suspend();
+        void (*entry)();        
         Task* run();
-        void report();
+        Task* setState(TaskState taskState);
+
+        #if defined(EXTRA_SUPPORT)
+        Task* elapsedShift(long tickShift);
+        Task* suspend();
+        #endif
+        #if (DEBUG_LEVEL>0)
+            void report();
+        #endif
 };
 
 class TaskManager {
@@ -41,9 +50,12 @@ class TaskManager {
         void init();
         void run();
         Task* addTask(void (*taskEntry)(), char *taskName, unsigned int tickInterval = 1000, TaskState state = RUNNING, int startDelay=0);
+        
+        #if (DEBUG_LEVEL>0)
         void debug();
         void activeTaskReport();
         void taskListReport();
+        #endif
         
     private:
         Task taskQueue[MaxTaskNumber];
@@ -57,18 +69,22 @@ class TaskManager {
         void UpdateTaskStat();
 };
 
+/*
 class Process : Task {
     // Not implemented yet   
     public:
         Process();   //constructor
 };
+*/
 
+/*
 class Thread : Task {
     // Not implemented yet   
     public:
         Task *parent;        
         Thread();   //constructor
 };
+*/
 
 class PreemptiveOS {
     // Other features, blocked I/O, semaphore, 

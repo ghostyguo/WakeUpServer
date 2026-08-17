@@ -5,8 +5,6 @@
 #include <Arduino.h>
 #include "RTOS.h"
 
-#define DEBUG_LEVEL        0
-
 // extern
 PreemptiveOS RTOS;
 
@@ -17,19 +15,6 @@ Task::Task()
 {
     
 }
- 
-Task* Task::setState(TaskState taskState)
-{
-    runningState = taskState;
-    executionTick = 0;
-    elapsedTick = 0; 
-}
-
-Task* Task::suspend() 
-{
-    setState(SUSPEND);      
-    return this;
-}
 
 Task* Task::run()
 {
@@ -37,11 +22,30 @@ Task* Task::run()
     return this;
 }
 
+Task* Task::setState(TaskState taskState)
+{
+    runningState = taskState;
+    executionTick = 0;
+    elapsedTick = 0; 
+}
+ 
+#if defined(EXTRA_SUPPORT)
+
 Task* Task::elapsedShift(long tickShift)
 {
     elapsedTick += tickShift;        
     return this;
 }
+
+Task* Task::suspend() 
+{
+    setState(SUSPEND);      
+    return this;
+}
+#endif
+
+// ---------- Debug fohctions --------
+#if (DEBUG_LEVEL>0)
 
 void Task::report()
 {  
@@ -66,6 +70,7 @@ void Task::report()
         default: Serial.println(F("UNDEFINED")); break;
     }
 }
+#endif // ---------- Debug fohctions --------
 
 /*
  *  TaskManager Class
@@ -127,9 +132,6 @@ void TaskManager::TaskSwitching(int algorithm)
     }
 }
 
-//RTOS::shutdiwn()
-const PROGMEM char str_RtosShutdown[] = "\n\nRTOS shutdown";
-
 void TaskManager::run()
 {  
     unsigned long diffMillis = millis()-lastMillis;
@@ -165,6 +167,8 @@ Task* TaskManager::addTask(void (*taskEntry)(), char *taskName, unsigned int tic
     return (&taskQueue[numberOfTask-1]); //TaskID
 }
 
+// ---------- Debug fohctions --------
+#if (DEBUG_LEVEL>0)
 void TaskManager::taskListReport()
 {
     Serial.print(F("*** TaskListReport : SwitchCount = "));
@@ -206,22 +210,27 @@ void TaskManager::activeTaskReport()
         Serial.println(F("No Task"));
     }
 }
+#endif // ---------- Debug fohctions --------
 
 /*
  *  Process Class
  */
+ /*
 Process::Process()
 {
   
 }
+*/
 
 /*
  *  Thread Class
  */
+/*
 Thread::Thread()
 {
   
 }
+ */
 
 /*
  *  PreemptiveOS Class
@@ -242,8 +251,8 @@ void PreemptiveOS::run()
 
 void PreemptiveOS::shutdown()
 {
-    Serial.println(str_RtosShutdown);
-    while(1);    
+    Serial.println(F("\n\n*** RTOS shutdown"));
+    while(1) delay(100);   
 }
 
 

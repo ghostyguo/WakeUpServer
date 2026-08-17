@@ -2,8 +2,8 @@
    WakeupSercver.h
 */
 
-#if (!defined(WakeupSercve_h))
-#define WakeupSercve_h
+#if (!defined(WakeupServer_h))
+#define WakeupServer_h
 
 struct WakeUpTime {
     bool Day[7]; //Sunday, Monday, ... Saturday
@@ -11,10 +11,10 @@ struct WakeUpTime {
 };
 
 struct Computer {
-    char Name[20];
+    char Name[16];
     byte IP[6];
     WakeUpTime WakeUp;
-    bool isWakeUping; //旗標: 是否正在喚醒
+    bool isWakeUping; //Flag
 };
 
 extern int NumberOfSite;
@@ -22,4 +22,5 @@ extern Computer SiteInfo[];
 
 
 
-#endif //WakeupSercve_h
+
+#endif //WakeupServer_h

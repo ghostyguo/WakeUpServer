@@ -20,6 +20,7 @@
  */
 
 #include "NTPClient.h"
+#include "LcdManager.h"
 
 NTPClient::NTPClient(UDP& udp) {
   this->_udp            = &udp;
@@ -83,9 +84,11 @@ void NTPClient::begin(unsigned int port) {
 
 bool NTPClient::forceUpdate() {
   #ifdef DEBUG_NTPClient
-    Serial.println("Update from NTP Server");
+    Serial.println(F("Update from NTP Server"));
   #endif
 
+   LCD_SetSource(LCD_NtpSync);
+   LCD_Update();
   // flush any existing packets
   while(this->_udp->parsePacket() != 0)
     this->_udp->flush();
